@@ -101,9 +101,48 @@ const Dashboard = () => {
                   View all
                 </Button>
               </div>
-              <Card className="p-6 min-h-[200px] flex items-center justify-center">
-                <p className="text-muted-foreground">공지사항이 없습니다.</p>
-              </Card>
+              <div className="space-y-3">
+                {[
+                  {
+                    title: "2024년 하반기 휴가 신청 안내",
+                    content: "2024년 하반기 연차 및 휴가 신청에 관한 공지사항입니다. 신청 마감일은 12월 15일입니다.",
+                    date: "2024.07.14",
+                    isImportant: true
+                  },
+                  {
+                    title: "시스템 점검 예정 안내",
+                    content: "오는 7월 20일 새벽 2시부터 4시까지 시스템 정기점검이 있을 예정입니다.",
+                    date: "2024.07.12",
+                    isImportant: false
+                  },
+                  {
+                    title: "신규 근무시간 관리 시스템 도입",
+                    content: "더욱 효율적인 근무시간 관리를 위해 새로운 시스템을 도입합니다.",
+                    date: "2024.07.10",
+                    isImportant: false
+                  }
+                ].map((notice, index) => (
+                  <Card key={index} className="p-4 hover:shadow-sm transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          {notice.isImportant && (
+                            <Badge className="bg-red-100 text-red-800 text-xs px-2 py-0.5">
+                              중요
+                            </Badge>
+                          )}
+                          <h3 className="font-medium text-foreground text-sm">{notice.title}</h3>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{notice.content}</p>
+                        <p className="text-xs text-muted-foreground">{notice.date}</p>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
             </div>
           </div>
 
