@@ -10,32 +10,165 @@ const Calendar = () => {
 
   // 샘플 이벤트 데이터
   const events = [
+    // 오늘 일정들
     {
       id: 1,
-      title: "팀 미팅",
-      date: "2024-01-15",
-      time: "14:00",
+      title: "일일 스탠드업 미팅",
+      date: new Date().toISOString().split('T')[0],
+      time: "09:00",
       type: "회의",
       location: "회의실 A",
       color: "bg-primary"
     },
     {
       id: 2,
+      title: "점심식사",
+      date: new Date().toISOString().split('T')[0],
+      time: "12:00",
+      type: "개인",
+      location: "사내 카페테리아",
+      color: "bg-green-500"
+    },
+    {
+      id: 3,
       title: "프로젝트 마감",
-      date: "2024-01-15",
+      date: new Date().toISOString().split('T')[0],
       time: "18:00",
       type: "마감",
       location: "온라인",
       color: "bg-destructive"
     },
+    
+    // 내일 일정들
     {
-      id: 3,
-      title: "점심 약속",
-      date: "2024-01-16",
-      time: "12:30",
+      id: 4,
+      title: "클라이언트 미팅",
+      date: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0],
+      time: "10:30",
+      type: "회의",
+      location: "강남 오피스",
+      color: "bg-primary"
+    },
+    {
+      id: 5,
+      title: "개발팀 회식",
+      date: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0],
+      time: "19:00",
+      type: "회식",
+      location: "홍대 맛집",
+      color: "bg-orange-500"
+    },
+    
+    // 이번 주 일정들
+    {
+      id: 6,
+      title: "월간 성과 발표",
+      date: new Date(Date.now() + 2*24*60*60*1000).toISOString().split('T')[0],
+      time: "14:00",
+      type: "발표",
+      location: "대회의실",
+      color: "bg-blue-500"
+    },
+    {
+      id: 7,
+      title: "병원 예약",
+      date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0],
+      time: "15:30",
       type: "개인",
-      location: "강남역",
-      color: "bg-accent"
+      location: "서울대병원",
+      color: "bg-pink-500"
+    },
+    {
+      id: 8,
+      title: "코드 리뷰",
+      date: new Date(Date.now() + 4*24*60*60*1000).toISOString().split('T')[0],
+      time: "11:00",
+      type: "회의",
+      location: "개발실",
+      color: "bg-primary"
+    },
+    {
+      id: 9,
+      title: "주간 팀 빌딩",
+      date: new Date(Date.now() + 5*24*60*60*1000).toISOString().split('T')[0],
+      time: "16:00",
+      type: "활동",
+      location: "한강공원",
+      color: "bg-green-500"
+    },
+    {
+      id: 10,
+      title: "가족 모임",
+      date: new Date(Date.now() + 6*24*60*60*1000).toISOString().split('T')[0],
+      time: "12:00",
+      type: "개인",
+      location: "집",
+      color: "bg-purple-500"
+    },
+    
+    // 다음 주 일정들
+    {
+      id: 11,
+      title: "신입사원 교육",
+      date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0],
+      time: "09:30",
+      type: "교육",
+      location: "교육실",
+      color: "bg-yellow-500"
+    },
+    {
+      id: 12,
+      title: "분기별 보고",
+      date: new Date(Date.now() + 8*24*60*60*1000).toISOString().split('T')[0],
+      time: "13:00",
+      type: "보고",
+      location: "임원실",
+      color: "bg-red-500"
+    },
+    {
+      id: 13,
+      title: "UX 워크샵",
+      date: new Date(Date.now() + 9*24*60*60*1000).toISOString().split('T')[0],
+      time: "10:00",
+      type: "워크샵",
+      location: "디자인센터",
+      color: "bg-indigo-500"
+    },
+    {
+      id: 14,
+      title: "휴가",
+      date: new Date(Date.now() + 10*24*60*60*1000).toISOString().split('T')[0],
+      time: "종일",
+      type: "휴가",
+      location: "부산",
+      color: "bg-cyan-500"
+    },
+    {
+      id: 15,
+      title: "휴가",
+      date: new Date(Date.now() + 11*24*60*60*1000).toISOString().split('T')[0],
+      time: "종일",
+      type: "휴가",
+      location: "부산",
+      color: "bg-cyan-500"
+    },
+    {
+      id: 16,
+      title: "프로젝트 킥오프",
+      date: new Date(Date.now() + 12*24*60*60*1000).toISOString().split('T')[0],
+      time: "15:00",
+      type: "킥오프",
+      location: "프로젝트룸",
+      color: "bg-emerald-500"
+    },
+    {
+      id: 17,
+      title: "기술 컨퍼런스",
+      date: new Date(Date.now() + 13*24*60*60*1000).toISOString().split('T')[0],
+      time: "09:00",
+      type: "컨퍼런스",
+      location: "코엑스",
+      color: "bg-violet-500"
     }
   ]
 
