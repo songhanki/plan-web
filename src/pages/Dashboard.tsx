@@ -1,164 +1,161 @@
-import { Calendar, Clock, CheckSquare, TrendingUp } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { MoreHorizontal, Plus } from "lucide-react"
 
 const Dashboard = () => {
-  const today = new Date()
-  const todayStr = today.toLocaleDateString('ko-KR', {
+  const currentDate = new Date().toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
-    weekday: 'long'
+    day: 'numeric'
   })
 
   return (
-    <div className="min-h-screen bg-gradient-subtle p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* 헤더 */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-foreground">
-            안녕하세요! 👋
-          </h1>
-          <p className="text-lg text-muted-foreground">{todayStr}</p>
+    <div className="min-h-screen bg-background">
+      {/* 헤더 */}
+      <div className="border-b bg-card px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-1">Welcome back, Evan</p>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {currentDate}
+          </div>
         </div>
+      </div>
 
-        {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="shadow-soft hover:shadow-elegant transition-shadow duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">오늘 할 일</CardTitle>
-              <CheckSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">5</div>
-              <p className="text-xs text-muted-foreground">
-                +2 어제보다
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-soft hover:shadow-elegant transition-shadow duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">이번 주 일정</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-accent">12</div>
-              <p className="text-xs text-muted-foreground">
-                3개 중요 일정
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-soft hover:shadow-elegant transition-shadow duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">남은 휴가</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-warning">15일</div>
-              <p className="text-xs text-muted-foreground">
-                총 25일 중
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-soft hover:shadow-elegant transition-shadow duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">생산성</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-success">85%</div>
-              <p className="text-xs text-muted-foreground">
-                +5% 지난 주 대비
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* 빠른 액션 */}
-        <Card className="shadow-soft">
-          <CardHeader>
-            <CardTitle>빠른 액션</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button className="h-20 bg-gradient-primary hover:opacity-90 transition-opacity">
-                <div className="text-center">
-                  <Calendar className="h-6 w-6 mx-auto mb-2" />
-                  <span>일정 추가</span>
-                </div>
-              </Button>
-              <Button className="h-20 bg-gradient-accent hover:opacity-90 transition-opacity">
-                <div className="text-center">
-                  <Clock className="h-6 w-6 mx-auto mb-2" />
-                  <span>휴가 신청</span>
-                </div>
-              </Button>
-              <Button variant="outline" className="h-20 hover:bg-muted transition-colors">
-                <div className="text-center">
-                  <CheckSquare className="h-6 w-6 mx-auto mb-2" />
-                  <span>할 일 추가</span>
-                </div>
+      {/* 메인 콘텐츠 */}
+      <div className="p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 왼쪽: 신청 진행 현황 */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium text-foreground">신청 진행 현황</h2>
+              <Button variant="ghost" size="sm" className="text-primary">
+                View all
               </Button>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* 최근 활동 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle>최근 일정</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  { title: "팀 미팅", time: "오후 2:00", type: "회의" },
-                  { title: "프로젝트 마감", time: "오후 6:00", type: "마감" },
-                  { title: "점심 약속", time: "오후 12:30", type: "개인" },
-                ].map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                    <div>
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">{item.type}</p>
+            <div className="space-y-3">
+              {[
+                {
+                  id: "휴가 (연차)",
+                  type: "휴가",
+                  duration: "3 days",
+                  startDate: "Sep 13, 2020",
+                  endDate: "Sep 16, 2020",
+                  status: "승인",
+                  statusColor: "bg-yellow-100 text-yellow-800"
+                },
+                {
+                  id: "휴가 (공가)",
+                  type: "휴가",
+                  duration: "3 days",
+                  startDate: "Sep 13, 2020",
+                  endDate: "Sep 16, 2020",
+                  status: "대기",
+                  statusColor: "bg-green-100 text-green-800"
+                },
+                {
+                  id: "휴가(복귀예정)",
+                  type: "휴가",
+                  duration: "3 days",
+                  startDate: "Sep 13, 2020",
+                  endDate: "Sep 16, 2020",
+                  status: "반려",
+                  statusColor: "bg-red-100 text-red-800"
+                }
+              ].map((item, index) => (
+                <Card key={index} className="p-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-2 h-8 bg-primary rounded-full" />
+                      <div>
+                        <h3 className="font-medium text-foreground">{item.id}</h3>
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
+                          <span>{item.type}</span>
+                          <span>{item.duration}</span>
+                          <span>{item.startDate}</span>
+                          <span>{item.endDate}</span>
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-sm font-medium text-primary">{item.time}</span>
+                    <div className="flex items-center space-x-2">
+                      <Badge className={`px-3 py-1 text-xs font-medium rounded-full ${item.statusColor}`}>
+                        {item.status}
+                      </Badge>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </Card>
+              ))}
+            </div>
 
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle>진행 중인 작업</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  { title: "웹사이트 리뉴얼", progress: 75, status: "진행중" },
-                  { title: "월간 보고서 작성", progress: 40, status: "진행중" },
-                  { title: "신규 기능 기획", progress: 90, status: "거의 완료" },
-                ].map((item, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium">{item.title}</p>
-                      <span className="text-sm text-muted-foreground">{item.progress}%</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div 
-                        className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${item.progress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">{item.status}</p>
-                  </div>
-                ))}
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-medium text-foreground">공지사항</h2>
+                <Button variant="ghost" size="sm" className="text-primary">
+                  View all
+                </Button>
               </div>
-            </CardContent>
-          </Card>
+              <Card className="p-6 min-h-[200px] flex items-center justify-center">
+                <p className="text-muted-foreground">공지사항이 없습니다.</p>
+              </Card>
+            </div>
+          </div>
+
+          {/* 오른쪽: 일일업무 일정 */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-medium text-foreground">일일업무 일정</h2>
+              <Button variant="ghost" size="sm" className="text-primary">
+                View all
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {[
+                {
+                  title: "스프린트 계획 (외부 개발자)",
+                  time: "09:00 AM",
+                  type: "meeting"
+                },
+                {
+                  title: "차세대 UX",
+                  time: "03:00 PM",
+                  type: "design"
+                },
+                {
+                  title: "개발 기반 보고 및 체크리스트",
+                  time: "06:20 PM",
+                  type: "review"
+                }
+              ].map((task, index) => (
+                <Card key={index} className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-foreground text-sm">{task.title}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{task.time}</p>
+                    </div>
+                    <Button variant="ghost" size="sm" className="ml-2">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            <Button 
+              variant="outline" 
+              className="w-full py-6 border-dashed border-2 hover:bg-muted/50"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              일정 추가하기
+            </Button>
+          </div>
         </div>
       </div>
     </div>
