@@ -3,174 +3,236 @@ import { Calendar as CalendarIcon, Plus, Clock, MapPin } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 
 const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [events, setEvents] = useState([
+  // 오늘 일정들
+  {
+    id: 1,
+    title: "일일 스탠드업 미팅",
+    date: new Date().toISOString().split('T')[0],
+    time: "09:00",
+    type: "회의",
+    location: "회의실 A",
+    color: "bg-primary"
+  },
+  {
+    id: 2,
+    title: "점심식사",
+    date: new Date().toISOString().split('T')[0],
+    time: "12:00",
+    type: "개인",
+    location: "사내 카페테리아",
+    color: "bg-green-500"
+  },
+  {
+    id: 3,
+    title: "프로젝트 마감",
+    date: new Date().toISOString().split('T')[0],
+    time: "18:00",
+    type: "마감",
+    location: "온라인",
+    color: "bg-destructive"
+  },
+  
+  // 내일 일정들
+  {
+    id: 4,
+    title: "클라이언트 미팅",
+    date: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0],
+    time: "10:30",
+    type: "회의",
+    location: "강남 오피스",
+    color: "bg-primary"
+  },
+  {
+    id: 5,
+    title: "개발팀 회식",
+    date: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0],
+    time: "19:00",
+    type: "회식",
+    location: "홍대 맛집",
+    color: "bg-orange-500"
+  },
+  
+  // 이번 주 일정들
+  {
+    id: 6,
+    title: "월간 성과 발표",
+    date: new Date(Date.now() + 2*24*60*60*1000).toISOString().split('T')[0],
+    time: "14:00",
+    type: "발표",
+    location: "대회의실",
+    color: "bg-blue-500"
+  },
+  {
+    id: 7,
+    title: "병원 예약",
+    date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0],
+    time: "15:30",
+    type: "개인",
+    location: "서울대병원",
+    color: "bg-pink-500"
+  },
+  {
+    id: 8,
+    title: "코드 리뷰",
+    date: new Date(Date.now() + 4*24*60*60*1000).toISOString().split('T')[0],
+    time: "11:00",
+    type: "회의",
+    location: "개발실",
+    color: "bg-primary"
+  },
+  {
+    id: 9,
+    title: "주간 팀 빌딩",
+    date: new Date(Date.now() + 5*24*60*60*1000).toISOString().split('T')[0],
+    time: "16:00",
+    type: "활동",
+    location: "한강공원",
+    color: "bg-green-500"
+  },
+  {
+    id: 10,
+    title: "가족 모임",
+    date: new Date(Date.now() + 6*24*60*60*1000).toISOString().split('T')[0],
+    time: "12:00",
+    type: "개인",
+    location: "집",
+    color: "bg-purple-500"
+  },
+  
+  // 다음 주 일정들
+  {
+    id: 11,
+    title: "신입사원 교육",
+    date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0],
+    time: "09:30",
+    type: "교육",
+    location: "교육실",
+    color: "bg-yellow-500"
+  },
+  {
+    id: 12,
+    title: "분기별 보고",
+    date: new Date(Date.now() + 8*24*60*60*1000).toISOString().split('T')[0],
+    time: "13:00",
+    type: "보고",
+    location: "임원실",
+    color: "bg-red-500"
+  },
+  {
+    id: 13,
+    title: "UX 워크샵",
+    date: new Date(Date.now() + 9*24*60*60*1000).toISOString().split('T')[0],
+    time: "10:00",
+    type: "워크샵",
+    location: "디자인센터",
+    color: "bg-indigo-500"
+  },
+  {
+    id: 14,
+    title: "휴가",
+    date: new Date(Date.now() + 10*24*60*60*1000).toISOString().split('T')[0],
+    time: "종일",
+    type: "휴가",
+    location: "부산",
+    color: "bg-cyan-500"
+  },
+  {
+    id: 15,
+    title: "휴가",
+    date: new Date(Date.now() + 11*24*60*60*1000).toISOString().split('T')[0],
+    time: "종일",
+    type: "휴가",
+    location: "부산",
+    color: "bg-cyan-500"
+  },
+  {
+    id: 16,
+    title: "프로젝트 킥오프",
+    date: new Date(Date.now() + 12*24*60*60*1000).toISOString().split('T')[0],
+    time: "15:00",
+    type: "킥오프",
+    location: "프로젝트룸",
+    color: "bg-emerald-500"
+  },
+  {
+    id: 17,
+    title: "기술 컨퍼런스",
+    date: new Date(Date.now() + 13*24*60*60*1000).toISOString().split('T')[0],
+    time: "09:00",
+    type: "컨퍼런스",
+    location: "코엑스",
+    color: "bg-violet-500"
+  }
+])
+  
+  // 폼 상태
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [formData, setFormData] = useState({
+    title: "",
+    date: "",
+    time: "",
+    type: "",
+    location: "",
+    description: ""
+  })
 
-  // 샘플 이벤트 데이터
-  const events = [
-    // 오늘 일정들
-    {
-      id: 1,
-      title: "일일 스탠드업 미팅",
-      date: new Date().toISOString().split('T')[0],
-      time: "09:00",
-      type: "회의",
-      location: "회의실 A",
-      color: "bg-primary"
-    },
-    {
-      id: 2,
-      title: "점심식사",
-      date: new Date().toISOString().split('T')[0],
-      time: "12:00",
-      type: "개인",
-      location: "사내 카페테리아",
-      color: "bg-green-500"
-    },
-    {
-      id: 3,
-      title: "프로젝트 마감",
-      date: new Date().toISOString().split('T')[0],
-      time: "18:00",
-      type: "마감",
-      location: "온라인",
-      color: "bg-destructive"
-    },
-    
-    // 내일 일정들
-    {
-      id: 4,
-      title: "클라이언트 미팅",
-      date: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0],
-      time: "10:30",
-      type: "회의",
-      location: "강남 오피스",
-      color: "bg-primary"
-    },
-    {
-      id: 5,
-      title: "개발팀 회식",
-      date: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0],
-      time: "19:00",
-      type: "회식",
-      location: "홍대 맛집",
-      color: "bg-orange-500"
-    },
-    
-    // 이번 주 일정들
-    {
-      id: 6,
-      title: "월간 성과 발표",
-      date: new Date(Date.now() + 2*24*60*60*1000).toISOString().split('T')[0],
-      time: "14:00",
-      type: "발표",
-      location: "대회의실",
-      color: "bg-blue-500"
-    },
-    {
-      id: 7,
-      title: "병원 예약",
-      date: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0],
-      time: "15:30",
-      type: "개인",
-      location: "서울대병원",
-      color: "bg-pink-500"
-    },
-    {
-      id: 8,
-      title: "코드 리뷰",
-      date: new Date(Date.now() + 4*24*60*60*1000).toISOString().split('T')[0],
-      time: "11:00",
-      type: "회의",
-      location: "개발실",
-      color: "bg-primary"
-    },
-    {
-      id: 9,
-      title: "주간 팀 빌딩",
-      date: new Date(Date.now() + 5*24*60*60*1000).toISOString().split('T')[0],
-      time: "16:00",
-      type: "활동",
-      location: "한강공원",
-      color: "bg-green-500"
-    },
-    {
-      id: 10,
-      title: "가족 모임",
-      date: new Date(Date.now() + 6*24*60*60*1000).toISOString().split('T')[0],
-      time: "12:00",
-      type: "개인",
-      location: "집",
-      color: "bg-purple-500"
-    },
-    
-    // 다음 주 일정들
-    {
-      id: 11,
-      title: "신입사원 교육",
-      date: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0],
-      time: "09:30",
-      type: "교육",
-      location: "교육실",
-      color: "bg-yellow-500"
-    },
-    {
-      id: 12,
-      title: "분기별 보고",
-      date: new Date(Date.now() + 8*24*60*60*1000).toISOString().split('T')[0],
-      time: "13:00",
-      type: "보고",
-      location: "임원실",
-      color: "bg-red-500"
-    },
-    {
-      id: 13,
-      title: "UX 워크샵",
-      date: new Date(Date.now() + 9*24*60*60*1000).toISOString().split('T')[0],
-      time: "10:00",
-      type: "워크샵",
-      location: "디자인센터",
-      color: "bg-indigo-500"
-    },
-    {
-      id: 14,
-      title: "휴가",
-      date: new Date(Date.now() + 10*24*60*60*1000).toISOString().split('T')[0],
-      time: "종일",
-      type: "휴가",
-      location: "부산",
-      color: "bg-cyan-500"
-    },
-    {
-      id: 15,
-      title: "휴가",
-      date: new Date(Date.now() + 11*24*60*60*1000).toISOString().split('T')[0],
-      time: "종일",
-      type: "휴가",
-      location: "부산",
-      color: "bg-cyan-500"
-    },
-    {
-      id: 16,
-      title: "프로젝트 킥오프",
-      date: new Date(Date.now() + 12*24*60*60*1000).toISOString().split('T')[0],
-      time: "15:00",
-      type: "킥오프",
-      location: "프로젝트룸",
-      color: "bg-emerald-500"
-    },
-    {
-      id: 17,
-      title: "기술 컨퍼런스",
-      date: new Date(Date.now() + 13*24*60*60*1000).toISOString().split('T')[0],
-      time: "09:00",
-      type: "컨퍼런스",
-      location: "코엑스",
-      color: "bg-violet-500"
+  // 일정 유형별 색상 매핑
+  const getEventColor = (type: string) => {
+    const colorMap: { [key: string]: string } = {
+      "회의": "bg-primary",
+      "개인": "bg-green-500",
+      "마감": "bg-destructive",
+      "회식": "bg-orange-500",
+      "발표": "bg-blue-500",
+      "교육": "bg-yellow-500",
+      "보고": "bg-red-500",
+      "워크샵": "bg-indigo-500",
+      "휴가": "bg-cyan-500",
+      "킥오프": "bg-emerald-500",
+      "컨퍼런스": "bg-violet-500",
+      "활동": "bg-green-500"
     }
-  ]
+    return colorMap[type] || "bg-gray-500"
+  }
+
+  // 일정 추가 함수
+  const addEvent = () => {
+    if (!formData.title || !formData.date || !formData.time || !formData.type) {
+      return
+    }
+
+    const newEvent = {
+      id: Math.max(...events.map(e => e.id), 0) + 1,
+      title: formData.title,
+      date: formData.date,
+      time: formData.time,
+      type: formData.type,
+      location: formData.location || "미정",
+      color: getEventColor(formData.type)
+    }
+
+    setEvents([...events, newEvent])
+    setFormData({
+      title: "",
+      date: "",
+      time: "",
+      type: "",
+      location: "",
+      description: ""
+    })
+    setIsDialogOpen(false)
+  }
+
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear()
@@ -234,10 +296,106 @@ const Calendar = () => {
             <CalendarIcon className="h-8 w-8 text-primary" />
             <h1 className="text-3xl font-bold text-foreground">캘린더</h1>
           </div>
-          <Button className="bg-gradient-primary hover:opacity-90 transition-opacity">
-            <Plus className="h-4 w-4 mr-2" />
-            일정 추가
-          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-primary hover:opacity-90 transition-opacity">
+                <Plus className="h-4 w-4 mr-2" />
+                일정 추가
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>새 일정 추가</DialogTitle>
+                <DialogDescription>
+                  새로운 일정을 추가하세요. 모든 필수 항목을 입력해주세요.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="title">제목 *</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({...prev, title: e.target.value}))}
+                    placeholder="일정 제목을 입력하세요"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="date">날짜 *</Label>
+                    <Input
+                      id="date"
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData(prev => ({...prev, date: e.target.value}))}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="time">시간 *</Label>
+                    <Input
+                      id="time"
+                      type="time"
+                      value={formData.time}
+                      onChange={(e) => setFormData(prev => ({...prev, time: e.target.value}))}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="type">유형 *</Label>
+                  <Select value={formData.type} onValueChange={(value) => setFormData(prev => ({...prev, type: value}))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="일정 유형을 선택하세요" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="회의">회의</SelectItem>
+                      <SelectItem value="개인">개인</SelectItem>
+                      <SelectItem value="마감">마감</SelectItem>
+                      <SelectItem value="회식">회식</SelectItem>
+                      <SelectItem value="발표">발표</SelectItem>
+                      <SelectItem value="교육">교육</SelectItem>
+                      <SelectItem value="보고">보고</SelectItem>
+                      <SelectItem value="워크샵">워크샵</SelectItem>
+                      <SelectItem value="휴가">휴가</SelectItem>
+                      <SelectItem value="킥오프">킥오프</SelectItem>
+                      <SelectItem value="컨퍼런스">컨퍼런스</SelectItem>
+                      <SelectItem value="활동">활동</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="location">장소</Label>
+                  <Input
+                    id="location"
+                    value={formData.location}
+                    onChange={(e) => setFormData(prev => ({...prev, location: e.target.value}))}
+                    placeholder="장소를 입력하세요"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">설명</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+                    placeholder="일정에 대한 추가 설명을 입력하세요"
+                    rows={3}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  취소
+                </Button>
+                <Button 
+                  onClick={addEvent}
+                  className="bg-gradient-primary hover:opacity-90"
+                  disabled={!formData.title || !formData.date || !formData.time || !formData.type}
+                >
+                  일정 추가
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
