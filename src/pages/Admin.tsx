@@ -1,8 +1,9 @@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Calendar } from "lucide-react";
+import { Users, Calendar, FileText } from "lucide-react";
 import MemberManagement from "@/components/admin/MemberManagement";
 import VacationManagement from "@/components/admin/VacationManagement";
+import NoticeManagement from "@/components/admin/NoticeManagement";
 
 const Admin = () => {
   return (
@@ -15,7 +16,7 @@ const Admin = () => {
       </div>
 
       <Tabs defaultValue="members" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="members" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
             회원 관리
@@ -23,6 +24,10 @@ const Admin = () => {
           <TabsTrigger value="vacation" className="flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             휴가승인 관리
+          </TabsTrigger>
+          <TabsTrigger value="notice" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            공지사항 관리
           </TabsTrigger>
         </TabsList>
         
@@ -32,6 +37,10 @@ const Admin = () => {
         
         <TabsContent value="vacation" className="mt-6">
           <VacationManagement />
+        </TabsContent>
+        
+        <TabsContent value="notice" className="mt-6">
+          <NoticeManagement />
         </TabsContent>
       </Tabs>
     </div>
