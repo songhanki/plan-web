@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { AppSidebar } from "@/components/AppSidebar";
+import ProfileDialog from "@/components/ProfileDialog";
 import Dashboard from "./pages/Dashboard";
 import Calendar from "./pages/Calendar";
 import Tasks from "./pages/Tasks";
@@ -20,6 +21,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [user, setUser] = useState<string | null>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const handleLogin = (username: string) => {
     setUser(username);
@@ -27,6 +29,10 @@ const App = () => {
 
   const handleLogout = () => {
     setUser(null);
+  };
+
+  const handleUpdateProfile = (newUsername: string) => {
+    setUser(newUsername);
   };
 
   if (!user) {
@@ -61,10 +67,15 @@ const App = () => {
                     </h2>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="flex items-center gap-2"
+                      onClick={() => setIsProfileOpen(true)}
+                    >
                       <User className="h-4 w-4" />
                       <span className="text-sm font-medium">{user}</span>
-                    </div>
+                    </Button>
                     <Button variant="outline" size="sm" onClick={handleLogout}>
                       <LogOut className="h-4 w-4 mr-1" />
                       로그아웃
@@ -83,6 +94,12 @@ const App = () => {
                 </main>
               </div>
             </div>
+            <ProfileDialog
+              isOpen={isProfileOpen}
+              onClose={() => setIsProfileOpen(false)}
+              currentUsername={user}
+              onUpdateProfile={handleUpdateProfile}
+            />
           </SidebarProvider>
         </BrowserRouter>
       </TooltipProvider>
