@@ -13,6 +13,9 @@ import Calendar from "./pages/Calendar";
 import Tasks from "./pages/Tasks";
 import Vacation from "./pages/Vacation";
 import Admin from "./pages/Admin";
+import MemberManagement from "./pages/MemberManagement";
+import VacationApproval from "./pages/VacationApproval";
+import NoticeManagement from "./pages/NoticeManagement";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { LogOut, User } from "lucide-react";
@@ -89,6 +92,9 @@ const App = () => {
                     <Route path="/tasks" element={<Tasks />} />
                     <Route path="/vacation" element={<Vacation />} />
                     <Route path="/admin" element={<Admin />} />
+                    <Route path="/member-management" element={<MemberManagement />} />
+                    <Route path="/vacation-approval" element={<VacationApproval />} />
+                    <Route path="/notice-management" element={<NoticeManagement />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </main>

@@ -1,4 +1,4 @@
-import { Calendar, Home, Clock, Settings, BarChart3, CheckSquare, UserCheck } from "lucide-react"
+import { Calendar, Home, Clock, Settings, BarChart3, CheckSquare, Users, ClipboardCheck, FileText } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 import {
   Sidebar,
@@ -17,7 +17,9 @@ const items = [
   { title: "캘린더", url: "/calendar", icon: Calendar },
   { title: "할 일", url: "/tasks", icon: CheckSquare },
   { title: "휴가 관리", url: "/vacation", icon: Clock },
-  { title: "관리자", url: "/admin", icon: UserCheck },
+  { title: "회원 관리", url: "/member-management", icon: Users },
+  { title: "휴가승인 관리", url: "/vacation-approval", icon: ClipboardCheck },
+  { title: "공지사항 관리", url: "/notice-management", icon: FileText },
   { title: "리포트", url: "/reports", icon: BarChart3 },
   { title: "설정", url: "/settings", icon: Settings },
 ]
