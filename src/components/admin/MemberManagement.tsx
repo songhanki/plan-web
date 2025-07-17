@@ -28,7 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UserPlus, Users, Edit, Trash2, Shield, User } from "lucide-react";
+import { UserPlus, Users, Edit, Trash2, Shield, User, Calendar, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Member {
@@ -40,6 +40,8 @@ interface Member {
   role: "admin" | "manager" | "employee";
   status: "active" | "inactive";
   joinDate: string;
+  totalVacationDays: number;
+  usedVacationDays: number;
 }
 
 const MemberManagement = () => {
@@ -53,7 +55,9 @@ const MemberManagement = () => {
       position: "시니어 개발자",
       role: "manager",
       status: "active",
-      joinDate: "2023-03-15"
+      joinDate: "2023-03-15",
+      totalVacationDays: 15,
+      usedVacationDays: 8
     },
     {
       id: "2",
@@ -63,7 +67,9 @@ const MemberManagement = () => {
       position: "마케팅 매니저",
       role: "manager",
       status: "active",
-      joinDate: "2023-01-20"
+      joinDate: "2023-01-20",
+      totalVacationDays: 15,
+      usedVacationDays: 12
     },
     {
       id: "3",
@@ -73,7 +79,9 @@ const MemberManagement = () => {
       position: "영업 사원",
       role: "employee",
       status: "active",
-      joinDate: "2023-06-10"
+      joinDate: "2023-06-10",
+      totalVacationDays: 12,
+      usedVacationDays: 5
     },
     {
       id: "4",
@@ -83,7 +91,9 @@ const MemberManagement = () => {
       position: "인사 담당자",
       role: "admin",
       status: "active",
-      joinDate: "2022-11-05"
+      joinDate: "2022-11-05",
+      totalVacationDays: 20,
+      usedVacationDays: 15
     }
   ]);
 
@@ -164,7 +174,9 @@ const MemberManagement = () => {
       id: Date.now().toString(),
       ...newMember,
       status: "active",
-      joinDate: new Date().toISOString().split('T')[0]
+      joinDate: new Date().toISOString().split('T')[0],
+      totalVacationDays: 15, // 기본 연차 15일
+      usedVacationDays: 0
     };
 
     setMembers(prev => [...prev, member]);
@@ -224,6 +236,8 @@ const MemberManagement = () => {
   const managerCount = members.filter(m => m.role === "manager").length;
   const employeeCount = members.filter(m => m.role === "employee").length;
   const activeCount = members.filter(m => m.status === "active").length;
+  const totalAvailableVacation = members.reduce((sum, m) => sum + (m.totalVacationDays - m.usedVacationDays), 0);
+  const totalUsedVacation = members.reduce((sum, m) => sum + m.usedVacationDays, 0);
 
   return (
     <div className="space-y-6">
@@ -308,7 +322,7 @@ const MemberManagement = () => {
       </div>
 
       {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">전체 회원</CardTitle>
@@ -348,6 +362,26 @@ const MemberManagement = () => {
             <div className="text-2xl font-bold text-red-600">{adminCount}</div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">사용 가능 연차</CardTitle>
+            <Calendar className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{totalAvailableVacation}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">사용된 연차</CardTitle>
+            <CalendarDays className="h-4 w-4 text-orange-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">{totalUsedVacation}</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* 회원 목록 */}
@@ -368,6 +402,7 @@ const MemberManagement = () => {
                 <TableHead>직급</TableHead>
                 <TableHead>권한</TableHead>
                 <TableHead>상태</TableHead>
+                <TableHead>연차 현황</TableHead>
                 <TableHead>입사일</TableHead>
                 <TableHead>관리</TableHead>
               </TableRow>
@@ -408,6 +443,17 @@ const MemberManagement = () => {
                         {getStatusText(member.status)}
                       </Badge>
                     </Button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-1">
+                      <div className="text-sm font-medium">
+                        <span className="text-green-600">사용가능: {member.totalVacationDays - member.usedVacationDays}일</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        <span className="text-orange-600">사용: {member.usedVacationDays}일</span> / 
+                        <span className="text-gray-600"> 총 {member.totalVacationDays}일</span>
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {member.joinDate}
