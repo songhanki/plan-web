@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,56 +47,31 @@ interface Member {
 
 const MemberManagement = () => {
   const { toast } = useToast();
-  const [members, setMembers] = useState<Member[]>([
-    {
-      id: "1",
-      name: "김철수",
-      email: "kim.cs@company.com",
-      department: "개발팀",
-      position: "시니어 개발자",
-      role: "manager",
-      status: "active",
-      joinDate: "2023-03-15",
-      totalVacationDays: 15,
-      usedVacationDays: 8
-    },
-    {
-      id: "2",
-      name: "이영희",
-      email: "lee.yh@company.com",
-      department: "마케팅팀",
-      position: "마케팅 매니저",
-      role: "manager",
-      status: "active",
-      joinDate: "2023-01-20",
-      totalVacationDays: 15,
-      usedVacationDays: 12
-    },
-    {
-      id: "3",
-      name: "박민수",
-      email: "park.ms@company.com",
-      department: "영업팀",
-      position: "영업 사원",
-      role: "employee",
-      status: "active",
-      joinDate: "2023-06-10",
-      totalVacationDays: 12,
-      usedVacationDays: 5
-    },
-    {
-      id: "4",
-      name: "정수진",
-      email: "jung.sj@company.com",
-      department: "인사팀",
-      position: "인사 담당자",
-      role: "admin",
-      status: "active",
-      joinDate: "2022-11-05",
-      totalVacationDays: 20,
-      usedVacationDays: 15
-    }
-  ]);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get('http://localhost:8080/api/members');
+        setMembers(response.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+        toast({
+          title: "에러",
+          description: err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.',
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMembers();
+  }, [toast]);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newMember, setNewMember] = useState<{
@@ -321,8 +297,18 @@ const MemberManagement = () => {
         </Dialog>
       </div>
 
-      {/* 통계 카드 */}
-      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+      {loading ? (
+        <div className="flex items-center justify-center p-8">
+          <div className="text-lg text-muted-foreground">데이터를 불러오는 중입니다...</div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center p-8">
+          <div className="text-lg text-red-600">데이터를 불러오는데 실패했습니다: {error}</div>
+        </div>
+      ) : (
+        <>
+          {/* 통계 카드 */}
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">전체 회원</CardTitle>
@@ -476,6 +462,8 @@ const MemberManagement = () => {
           </Table>
         </CardContent>
       </Card>
+        </>
+      )}
     </div>
   );
 };
