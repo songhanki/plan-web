@@ -1,21 +1,43 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import CryptoJS from "crypto-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
-interface LoginProps {
-  onLogin: (username: string) => void;
-}
-
-const Login = ({ onLogin }: LoginProps) => {
-  const [username, setUsername] = useState("");
+const Login = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.trim()) {
-      onLogin(username);
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 비밀번호를 SHA256으로 해시화
+      const hashedPassword = CryptoJS.SHA256(password).toString();
+      
+      const response = await axios.post("/api/auth/login", {
+        email,
+        password: hashedPassword,
+      });
+
+      const { accessToken, refreshToken } = response.data;
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
+      navigate("/");
+    } catch (err) {
+      setError("로그인에 실패했습니다. 사용자명 또는 비밀번호를 확인해주세요.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -31,13 +53,13 @@ const Login = ({ onLogin }: LoginProps) => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">사용자명</Label>
+              <Label htmlFor="email">이메일</Label>
               <Input
-                id="username"
+                id="email"
                 type="text"
                 placeholder="사용자명을 입력하세요"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -52,8 +74,9 @@ const Login = ({ onLogin }: LoginProps) => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              로그인
+            {error && <p className="text-sm text-red-500">{error}</p>}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "로그인 중..." : "로그인"}
             </Button>
           </form>
         </CardContent>

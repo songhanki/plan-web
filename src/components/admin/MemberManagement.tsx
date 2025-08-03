@@ -56,7 +56,7 @@ const MemberManagement = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get('http://localhost:8080/api/members');
+        const response = await axios.get('/api/members');
         setMembers(response.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
