@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -28,6 +28,7 @@ const App = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [username, setUsername] = useState<string | null>(null); // 사용자 이름 상태 추가
   const navigate = useNavigate();
+  const { username: userName } = useLocation().state || {};
 
   useEffect(() => {
     const validateToken = async () => {
@@ -45,7 +46,8 @@ const App = () => {
           },
         });
         // 사용자 이름 설정 (API 응답에 사용자 정보가 있다고 가정)
-        setUsername(response.data.username); 
+        setUsername(userName); 
+        console.log(response);
         setIsLoggedIn(true);
       } catch (error) {
         console.error("Token validation failed:", error);

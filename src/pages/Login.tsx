@@ -32,7 +32,7 @@ const Login = () => {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
 
-      navigate("/");
+      navigate("/", { state: { username: response.data.name } });
     } catch (err) {
       setError("로그인에 실패했습니다. 사용자명 또는 비밀번호를 확인해주세요.");
       console.error(err);
