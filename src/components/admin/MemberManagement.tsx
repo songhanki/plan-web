@@ -50,63 +50,16 @@ const MemberManagement = () => {
   const [newMember, setNewMember] = useState<NewMemberInput>({
     name: "",
     email: "",
+    nickname: "",
     department: "",
     position: "",
-    role: "role-user"
+    roleName: "일반사용자"
   });
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<EditMember | null>(null);
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case "role-admin":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "role-manager":
-        return "bg-blue-100 text-blue-800 border-blue-200";
-      case "role-user":
-        return "bg-green-100 text-green-800 border-green-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getRoleText = (role: string) => {
-    switch (role) {
-      case "role-admin":
-        return "관리자";
-      case "role-manager":
-        return "팀장";
-      case "role-user":
-        return "일반사용자";
-      default:
-        return role;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "INACTIVE":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "ACTIVE":
-        return "활성";
-      case "INACTIVE":
-        return "비활성";
-      default:
-        return status;
-    }
-  };
-
-  const handleAddMember = () => {
+    const handleAddMember = () => {
     if (!newMember.name || !newMember.email || !newMember.department || !newMember.position) {
       toast({
         title: "입력 오류",
@@ -123,16 +76,17 @@ const MemberManagement = () => {
       joinDate: new Date().toISOString().split('T')[0],
       totalVacationDays: 15, // 기본 연차 15일
       usedVacationDays: 0,
-      roleId: "role-user"
+      roleName: "일반사용자",
+      nickname: ""
     };
-
     setMembers(prev => [...prev, member]);
     setNewMember({
       name: "",
-      email: "",
+      email: "", 
+      nickname: "",
       department: "",
       position: "",
-      role: "role-user"
+      roleName: "일반사용자", // 기본 역할 추가
     });
     setIsAddDialogOpen(false);
 
@@ -151,7 +105,6 @@ const MemberManagement = () => {
       variant: "destructive",
     });
   };
-
   const handleEditMember = (member: Member) => {
     setEditingMember(member);
     setIsEditDialogOpen(true);
@@ -171,10 +124,7 @@ const MemberManagement = () => {
 
     setMembers(prev =>
       prev.map(member =>
-        member.id === editingMember.id ? {
-          ...editingMember,
-          roleId: member.roleId // 기존 roleId 유지
-        } : member
+        member.id === editingMember.id ? editingMember : member
       )
     );
     
@@ -187,10 +137,10 @@ const MemberManagement = () => {
     });
   };
 
-  const adminCount = members.filter(m => m.role === "role-admin").length;
-  const managerCount = members.filter(m => m.role === "role-manager").length;
-  const employeeCount = members.filter(m => m.role === "role-user").length;
-  const activeCount = members.filter(m => m.status === "ACTIVE").length;
+  const adminCount = members.filter(m => m.roleName === "관리자").length;
+  const managerCount = members.filter(m => m.roleName === "팀장").length;
+  const employeeCount = members.filter(m => m.roleName === "일반사용자").length;
+  const activeCount = members.filter(m => m.status === "활성").length;
   const totalAvailableVacation = members.reduce((sum, m) => sum + (m.totalVacationDays - m.usedVacationDays), 0);
   const totalUsedVacation = members.reduce((sum, m) => sum + m.usedVacationDays, 0);
 
@@ -307,6 +257,7 @@ const MemberManagement = () => {
               <TableRow>
                 <TableHead>이름</TableHead>
                 <TableHead>이메일</TableHead>
+                <TableHead>닉네임</TableHead>
                 <TableHead>부서</TableHead>
                 <TableHead>직급</TableHead>
                 <TableHead>권한</TableHead>
@@ -321,14 +272,11 @@ const MemberManagement = () => {
                 <TableRow key={member.id}>
                   <TableCell className="font-medium">{member.name}</TableCell>
                   <TableCell>{member.email}</TableCell>
+                  <TableCell>{member.nickname}</TableCell>
                   <TableCell>{member.department}</TableCell>
                   <TableCell>{member.position}</TableCell>
-                  <TableCell>
-                    <span className={getRoleColor(member.role)}>{getRoleText(member.roleId)}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className={getStatusColor(member.status)}>{getStatusText(member.status)}</span>
-                  </TableCell>
+                  <TableCell>{member.roleName}</TableCell>
+                  <TableCell>{member.status}</TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
                       <div className="text-sm font-medium">

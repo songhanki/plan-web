@@ -21,9 +21,10 @@ import {
 export type NewMemberInput = {
   name: string;
   email: string;
+  nickname: string;
   department: string;
   position: string;
-  role: "role-admin" | "role-manager" | "role-user";
+  roleName: string;
 };
 
 type MemberAddProps = {
@@ -63,6 +64,15 @@ const MemberAdd = ({ open, onOpenChange, newMember, setNewMember, onSubmit }: Me
             />
           </div>
           <div>
+            <Label htmlFor="nickname">닉네임</Label>
+            <Input
+              id="nickname"
+              value={newMember.nickname}
+              onChange={(e) => setNewMember((prev) => ({ ...prev, nickname: e.target.value }))}
+              placeholder="닉네임을 입력하세요"
+            />
+          </div>
+          <div>
             <Label htmlFor="department">부서</Label>
             <Input
               id="department"
@@ -83,21 +93,28 @@ const MemberAdd = ({ open, onOpenChange, newMember, setNewMember, onSubmit }: Me
           <div>
             <Label htmlFor="role">권한</Label>
             <Select
-              value={newMember.role}
-              onValueChange={(value: "role-admin" | "role-manager" | "role-user") =>
-                setNewMember((prev) => ({ ...prev, role: value }))
+              value={newMember.roleName}
+              onValueChange={(value: "관리자" | "팀장" | "일반사용자") =>
+                setNewMember((prev) => ({ ...prev, roleName: value }))
               }
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="employee">직원</SelectItem>
-                <SelectItem value="manager">매니저</SelectItem>
-                <SelectItem value="admin">관리자</SelectItem>
+                <SelectItem value="role-user">일반사용자</SelectItem>
+                <SelectItem value="role-manager">팀장</SelectItem>
+                <SelectItem value="role-admin">관리자</SelectItem>
               </SelectContent>
             </Select>
           </div>
+          <div>
+              <Label htmlFor="edit-joinDate">입사일</Label>
+              <Input
+                id="edit-joinDate"
+                type="date"
+              />
+            </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

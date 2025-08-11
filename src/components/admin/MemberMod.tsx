@@ -21,11 +21,12 @@ import {
 export type EditMember = {
   id: string;
   name: string;
-  email: string;
+  email: string;  
+  nickname: string;
   department: string;
   position: string;
-  role: string; // accept API variations e.g., "admin" | "role-admin"
-  status: string; // accept API variations e.g., "active" | "ACTIVE"
+  roleName: string;
+  status: string; // accept API variations e.g., "활성" | "비활성" | "정지" | "탈퇴"
   joinDate: string;
   totalVacationDays: number;
   usedVacationDays: number;
@@ -69,6 +70,15 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
               />
             </div>
             <div>
+              <Label htmlFor="edit-nickname">닉네임</Label>
+              <Input
+                id="edit-nickname"
+                value={member.nickname}
+                onChange={(e) => setMember((prev) => (prev ? { ...prev, nickname: e.target.value } : prev))}
+                placeholder="닉네임을 입력하세요"
+              />
+            </div>
+            <div>
               <Label htmlFor="edit-department">부서</Label>
               <Input
                 id="edit-department"
@@ -89,17 +99,17 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
             <div>
               <Label htmlFor="edit-role">권한</Label>
               <Select
-                value={member.role}
-                onValueChange={(value: "role-admin" | "role-manager" | "role-user") =>
-                  setMember((prev) => (prev ? { ...prev, role: value } : prev))
+                value={member.roleName}
+                onValueChange={(value: "관리자" | "팀장" | "일반사용자") =>
+                  setMember((prev) => (prev ? { ...prev, roleName: value } : prev))
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="role-user">직원</SelectItem>
-                  <SelectItem value="role-manager">매니저</SelectItem>
+                  <SelectItem value="role-user">일반사용자</SelectItem>
+                  <SelectItem value="role-manager">팀장</SelectItem>
                   <SelectItem value="role-admin">관리자</SelectItem>
                 </SelectContent>
               </Select>
