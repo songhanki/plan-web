@@ -122,7 +122,8 @@ const MemberManagement = () => {
       status: "ACTIVE",
       joinDate: new Date().toISOString().split('T')[0],
       totalVacationDays: 15, // 기본 연차 15일
-      usedVacationDays: 0
+      usedVacationDays: 0,
+      roleId: "role-user"
     };
 
     setMembers(prev => [...prev, member]);
@@ -141,34 +142,7 @@ const MemberManagement = () => {
     });
   };
 
-  const handleRoleChange = (memberId: string, newRole: "admin" | "manager" | "employee") => {
-    setMembers(prev =>
-      prev.map(member =>
-        member.id === memberId ? { ...member, role: newRole } : member
-      )
-    );
-
-    toast({
-      title: "권한 변경 완료",
-      description: "회원 권한이 변경되었습니다.",
-    });
-  };
-
-  const handleStatusToggle = (memberId: string) => {
-    setMembers(prev =>
-      prev.map(member =>
-        member.id === memberId
-          ? { ...member, status: member.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }
-          : member
-      )
-    );
-
-    toast({
-      title: "상태 변경 완료",
-      description: "회원 상태가 변경되었습니다.",
-    });
-  };
-
+  
   const handleDeleteMember = (memberId: string) => {
     setMembers(prev => prev.filter(member => member.id !== memberId));
     toast({
@@ -197,7 +171,10 @@ const MemberManagement = () => {
 
     setMembers(prev =>
       prev.map(member =>
-        member.id === editingMember.id ? editingMember : member
+        member.id === editingMember.id ? {
+          ...editingMember,
+          roleId: member.roleId // 기존 roleId 유지
+        } : member
       )
     );
     

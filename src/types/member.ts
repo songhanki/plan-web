@@ -1,4 +1,5 @@
 export interface Member {
+  roleId: string;
   id: string;
   name: string;
   email: string;
