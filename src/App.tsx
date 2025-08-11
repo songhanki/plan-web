@@ -45,9 +45,8 @@ const App = () => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        // 사용자 이름 설정 (API 응답에 사용자 정보가 있다고 가정)
+        // 사용자 이름 설정 (Login.tsx에서 전달받은 사용자 이름)
         setUsername(userName); 
-        console.log(response);
         setIsLoggedIn(true);
       } catch (error) {
         console.error("Token validation failed:", error);

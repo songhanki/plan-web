@@ -2,25 +2,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -31,19 +12,11 @@ import {
 } from "@/components/ui/table";
 import { UserPlus, Users, Edit, Trash2, Shield, User, Calendar, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import MemberAdd, { NewMemberInput } from "./MemberAdd";
+import MemberMod, { EditMember } from "./MemberMod";
+import type { Member } from "@/types/member";
 
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  department: string;
-  position: string;
-  role: "admin" | "manager" | "employee";
-  status: "active" | "inactive";
-  joinDate: string;
-  totalVacationDays: number;
-  usedVacationDays: number;
-}
+// Member type moved to src/types/member.ts
 
 const MemberManagement = () => {
   const { toast } = useToast();
@@ -74,27 +47,24 @@ const MemberManagement = () => {
   }, [toast]);
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [newMember, setNewMember] = useState<{
-    name: string;
-    email: string;
-    department: string;
-    position: string;
-    role: "admin" | "manager" | "employee";
-  }>({
+  const [newMember, setNewMember] = useState<NewMemberInput>({
     name: "",
     email: "",
     department: "",
     position: "",
-    role: "employee"
+    role: "role-user"
   });
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState<EditMember | null>(null);
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case "admin":
+      case "role-admin":
         return "bg-red-100 text-red-800 border-red-200";
-      case "manager":
+      case "role-manager":
         return "bg-blue-100 text-blue-800 border-blue-200";
-      case "employee":
+      case "role-user":
         return "bg-green-100 text-green-800 border-green-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
@@ -103,12 +73,12 @@ const MemberManagement = () => {
 
   const getRoleText = (role: string) => {
     switch (role) {
-      case "admin":
+      case "role-admin":
         return "관리자";
-      case "manager":
-        return "매니저";
-      case "employee":
-        return "직원";
+      case "role-manager":
+        return "팀장";
+      case "role-user":
+        return "일반사용자";
       default:
         return role;
     }
@@ -116,9 +86,9 @@ const MemberManagement = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "active":
+      case "ACTIVE":
         return "bg-green-100 text-green-800 border-green-200";
-      case "inactive":
+      case "INACTIVE":
         return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
@@ -127,9 +97,9 @@ const MemberManagement = () => {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "active":
+      case "ACTIVE":
         return "활성";
-      case "inactive":
+      case "INACTIVE":
         return "비활성";
       default:
         return status;
@@ -149,7 +119,7 @@ const MemberManagement = () => {
     const member: Member = {
       id: Date.now().toString(),
       ...newMember,
-      status: "active",
+      status: "ACTIVE",
       joinDate: new Date().toISOString().split('T')[0],
       totalVacationDays: 15, // 기본 연차 15일
       usedVacationDays: 0
@@ -161,7 +131,7 @@ const MemberManagement = () => {
       email: "",
       department: "",
       position: "",
-      role: "employee"
+      role: "role-user"
     });
     setIsAddDialogOpen(false);
 
@@ -188,7 +158,7 @@ const MemberManagement = () => {
     setMembers(prev =>
       prev.map(member =>
         member.id === memberId
-          ? { ...member, status: member.status === "active" ? "inactive" : "active" }
+          ? { ...member, status: member.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }
           : member
       )
     );
@@ -208,10 +178,42 @@ const MemberManagement = () => {
     });
   };
 
-  const adminCount = members.filter(m => m.role === "admin").length;
-  const managerCount = members.filter(m => m.role === "manager").length;
-  const employeeCount = members.filter(m => m.role === "employee").length;
-  const activeCount = members.filter(m => m.status === "active").length;
+  const handleEditMember = (member: Member) => {
+    setEditingMember(member);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateMember = () => {
+    if (!editingMember) return;
+
+    if (!editingMember.name || !editingMember.email || !editingMember.department || !editingMember.position) {
+      toast({
+        title: "입력 오류",
+        description: "모든 필드를 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setMembers(prev =>
+      prev.map(member =>
+        member.id === editingMember.id ? editingMember : member
+      )
+    );
+    
+    setIsEditDialogOpen(false);
+    setEditingMember(null);
+
+    toast({
+      title: "회원 수정 완료",
+      description: `${editingMember.name}님의 정보가 수정되었습니다.`,
+    });
+  };
+
+  const adminCount = members.filter(m => m.role === "role-admin").length;
+  const managerCount = members.filter(m => m.role === "role-manager").length;
+  const employeeCount = members.filter(m => m.role === "role-user").length;
+  const activeCount = members.filter(m => m.status === "ACTIVE").length;
   const totalAvailableVacation = members.reduce((sum, m) => sum + (m.totalVacationDays - m.usedVacationDays), 0);
   const totalUsedVacation = members.reduce((sum, m) => sum + m.usedVacationDays, 0);
 
@@ -219,83 +221,27 @@ const MemberManagement = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-foreground">회원 관리</h2>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="h-4 w-4 mr-2" />
-              회원 추가
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>새 회원 추가</DialogTitle>
-              <DialogDescription>
-                새로운 회원의 정보를 입력해주세요.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">이름</Label>
-                <Input
-                  id="name"
-                  value={newMember.name}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="이름을 입력하세요"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">이메일</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={newMember.email}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder="이메일을 입력하세요"
-                />
-              </div>
-              <div>
-                <Label htmlFor="department">부서</Label>
-                <Input
-                  id="department"
-                  value={newMember.department}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, department: e.target.value }))}
-                  placeholder="부서를 입력하세요"
-                />
-              </div>
-              <div>
-                <Label htmlFor="position">직급</Label>
-                <Input
-                  id="position"
-                  value={newMember.position}
-                  onChange={(e) => setNewMember(prev => ({ ...prev, position: e.target.value }))}
-                  placeholder="직급을 입력하세요"
-                />
-              </div>
-              <div>
-                <Label htmlFor="role">권한</Label>
-                <Select value={newMember.role} onValueChange={(value: "admin" | "manager" | "employee") => 
-                  setNewMember(prev => ({ ...prev, role: value }))
-                }>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="employee">직원</SelectItem>
-                    <SelectItem value="manager">매니저</SelectItem>
-                    <SelectItem value="admin">관리자</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                취소
-              </Button>
-              <Button onClick={handleAddMember}>추가</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => setIsAddDialogOpen(true)}>
+          <UserPlus className="h-4 w-4 mr-2" />
+          회원 추가
+        </Button>
       </div>
+
+      <MemberAdd
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        newMember={newMember}
+        setNewMember={setNewMember}
+        onSubmit={handleAddMember}
+      />
+
+      <MemberMod
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        member={editingMember}
+        setMember={setEditingMember}
+        onSubmit={handleUpdateMember}
+      />
 
       {loading ? (
         <div className="flex items-center justify-center p-8">
@@ -401,34 +347,10 @@ const MemberManagement = () => {
                   <TableCell>{member.department}</TableCell>
                   <TableCell>{member.position}</TableCell>
                   <TableCell>
-                    <Select 
-                      value={member.role} 
-                      onValueChange={(value: "admin" | "manager" | "employee") => 
-                        handleRoleChange(member.id, value)
-                      }
-                    >
-                      <SelectTrigger className="w-28">
-                        <Badge className={getRoleColor(member.role)}>
-                          {getRoleText(member.role)}
-                        </Badge>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="employee">직원</SelectItem>
-                        <SelectItem value="manager">매니저</SelectItem>
-                        <SelectItem value="admin">관리자</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <span className={getRoleColor(member.role)}>{getRoleText(member.roleId)}</span>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleStatusToggle(member.id)}
-                    >
-                      <Badge className={getStatusColor(member.status)}>
-                        {getStatusText(member.status)}
-                      </Badge>
-                    </Button>
+                    <span className={getStatusColor(member.status)}>{getStatusText(member.status)}</span>
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
@@ -446,6 +368,14 @@ const MemberManagement = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditMember(member)}
+                        className="h-8 px-3"
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
                       <Button
                         size="sm"
                         variant="outline"
