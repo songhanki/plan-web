@@ -14,7 +14,6 @@ export default defineConfig(({ mode }) => ({
         changeOrigin: true,
       },
     },
-    },
   },
   plugins: [
     react(),
