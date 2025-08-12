@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -19,67 +19,80 @@ import NoticeManagement from "./pages/NoticeManagement";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { LogOut, User } from "lucide-react";
-import axios from "axios";
+import { useUserStore } from "@/stores/userStore";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("accessToken"));
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [username, setUsername] = useState<string | null>(null); // 사용자 이름 상태 추가
   const navigate = useNavigate();
-  const { username: userName } = useLocation().state || {};
+  
+  // Zustand 사용자 스토어에서 상태와 액션 가져오기
+  const {
+    authStatus,
+    userProfile,
+    isProfileDialogOpen,
+    validateToken,
+    logout,
+    setIsProfileDialogOpen,
+    updateUserProfile,
+    getDisplayName,
+    isAuthenticated
+  } = useUserStore();
 
+  // 토큰 검증 및 주기적 갱신
   useEffect(() => {
-    const validateToken = async () => {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) {
-        setIsLoggedIn(false);
-        navigate("/login");
-        return;
-      }
-
+    const performTokenValidation = async () => {
       try {
-        const response = await axios.post("/api/v1/tokens/validate", {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        // 사용자 이름 설정 (Login.tsx에서 전달받은 사용자 이름)
-        setUsername(userName); 
-        setIsLoggedIn(true);
+        await validateToken();
       } catch (error) {
-        console.error("Token validation failed:", error);
-        handleLogout();
+        console.error("토큰 검증 실패:", error);
+        navigate("/login");
       }
     };
 
-    validateToken();
+    // 초기 토큰 검증
+    performTokenValidation();
 
-    const intervalId = setInterval(validateToken, 5 * 60 * 1000); // 5분마다 실행
+    // 5분마다 토큰 검증
+    const TOKEN_VALIDATION_INTERVAL_MS = 5 * 60 * 1000;
+    const intervalId = setInterval(performTokenValidation, TOKEN_VALIDATION_INTERVAL_MS);
 
     return () => clearInterval(intervalId);
-  }, [navigate]);
+  }, [validateToken, navigate]);
 
 
+  // 로그아웃 처리
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    setIsLoggedIn(false);
-    setUsername(null);
+    logout();
     navigate("/login");
   };
 
-  const handleUpdateProfile = (newUsername: string) => {
-    setUsername(newUsername);
+  // 프로필 업데이트 처리 (닉네임 변경)
+  const handleUpdateProfile = async (newNickname: string) => {
+    if (!userProfile) return;
+    
+    try {
+      await updateUserProfile({ nickname: newNickname });
+    } catch (error) {
+      console.error("프로필 업데이트 실패:", error);
+    }
   };
+
+  // 로딩 상태 처리
+  if (authStatus === 'LOADING') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg text-muted-foreground">로딩 중...</div>
+      </div>
+    );
+  }
 
   return (
     <Routes>
       <Route
         path="/*"
         element={
-          isLoggedIn ? (
+          isAuthenticated() ? (
             <SidebarProvider>
               <div className="min-h-screen flex w-full">
                 <AppSidebar />
@@ -96,10 +109,10 @@ const App = () => {
                         variant="ghost"
                         size="sm"
                         className="flex items-center gap-2"
-                        onClick={() => setIsProfileOpen(true)}
+                        onClick={() => setIsProfileDialogOpen(true)}
                       >
                         <User className="h-4 w-4" />
-                        <span className="text-sm font-medium">{username}</span>
+                        <span className="text-sm font-medium">{getDisplayName()}</span>
                       </Button>
                       <Button variant="outline" size="sm" onClick={handleLogout}>
                         <LogOut className="h-4 w-4 mr-1" />
@@ -123,9 +136,9 @@ const App = () => {
                 </div>
               </div>
               <ProfileDialog
-                isOpen={isProfileOpen}
-                onClose={() => setIsProfileOpen(false)}
-                currentUsername={username || ""}
+                isOpen={isProfileDialogOpen}
+                onClose={() => setIsProfileDialogOpen(false)}
+                currentNickname={getDisplayName()}
                 onUpdateProfile={handleUpdateProfile}
               />
             </SidebarProvider>

@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,54 +11,51 @@ import {
 } from "@/components/ui/table";
 import { UserPlus, Users, Edit, Trash2, Shield, User, Calendar, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import MemberAdd, { NewMemberInput } from "./MemberAdd";
-import MemberMod, { EditMember } from "./MemberMod";
-import type { Member } from "@/types/member";
-
-// Member type moved to src/types/member.ts
+import { useMemberStore } from "@/stores/memberStore";
+import MemberAdd from "./MemberAdd";
+import MemberMod from "./MemberMod";
 
 const MemberManagement = () => {
   const { toast } = useToast();
-  const [members, setMembers] = useState<Member[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  
+  // Zustand 스토어에서 상태와 액션 가져오기
+  const {
+    members,
+    loading,
+    error,
+    isAddDialogOpen,
+    isEditDialogOpen,
+    editingMember,
+    newMember,
+    fetchMembers,
+    addMember,
+    updateMember,
+    deleteMember,
+    setIsAddDialogOpen,
+    setIsEditDialogOpen,
+    setEditingMember,
+    setNewMember,
+    resetNewMember,
+    getStatistics
+  } = useMemberStore();
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      setLoading(true);
-      setError(null);
+    const loadMembers = async () => {
       try {
-        const response = await axios.get('/api/members');
-        setMembers(response.data);
+        await fetchMembers();
       } catch (err) {
-        setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
         toast({
           title: "에러",
-          description: err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.',
+          description: error || '데이터를 불러오는데 실패했습니다.',
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchMembers();
-  }, [toast]);
+    loadMembers();
+  }, [fetchMembers, toast, error]);
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [newMember, setNewMember] = useState<NewMemberInput>({
-    name: "",
-    email: "",
-    nickname: "",
-    department: "",
-    position: "",
-    roleName: "일반사용자"
-  });
-
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<EditMember | null>(null);
-
-    const handleAddMember = () => {
+  const handleAddMember = async () => {
     if (!newMember.name || !newMember.email || !newMember.department || !newMember.position) {
       toast({
         title: "입력 오류",
@@ -69,48 +65,44 @@ const MemberManagement = () => {
       return;
     }
 
-    const member: Member = {
-      id: Date.now().toString(),
-      ...newMember,
-      status: "ACTIVE",
-      joinDate: new Date().toISOString().split('T')[0],
-      totalVacationDays: 15, // 기본 연차 15일
-      usedVacationDays: 0,
-      roleName: "일반사용자",
-      nickname: ""
-    };
-    setMembers(prev => [...prev, member]);
-    setNewMember({
-      name: "",
-      email: "", 
-      nickname: "",
-      department: "",
-      position: "",
-      roleName: "일반사용자", // 기본 역할 추가
-    });
-    setIsAddDialogOpen(false);
-
-    toast({
-      title: "회원 추가 완료",
-      description: `${member.name}님이 추가되었습니다.`,
-    });
+    try {
+      await addMember(newMember);
+      toast({
+        title: "회원 추가 완료",
+        description: `${newMember.name}님이 추가되었습니다.`,
+      });
+    } catch (error) {
+      toast({
+        title: "회원 추가 실패",
+        description: "회원 추가 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
   };
 
-  
-  const handleDeleteMember = (memberId: string) => {
-    setMembers(prev => prev.filter(member => member.id !== memberId));
-    toast({
-      title: "회원 삭제 완료",
-      description: "회원이 삭제되었습니다.",
-      variant: "destructive",
-    });
+  const handleDeleteMember = async (memberId: string) => {
+    try {
+      await deleteMember(memberId);
+      toast({
+        title: "회원 삭제 완료",
+        description: "회원이 삭제되었습니다.",
+        variant: "destructive",
+      });
+    } catch (error) {
+      toast({
+        title: "회원 삭제 실패",
+        description: "회원 삭제 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
   };
-  const handleEditMember = (member: Member) => {
+
+  const handleEditMember = (member: any) => {
     setEditingMember(member);
     setIsEditDialogOpen(true);
   };
 
-  const handleUpdateMember = () => {
+  const handleUpdateMember = async () => {
     if (!editingMember) return;
 
     if (!editingMember.name || !editingMember.email || !editingMember.department || !editingMember.position) {
@@ -122,27 +114,23 @@ const MemberManagement = () => {
       return;
     }
 
-    setMembers(prev =>
-      prev.map(member =>
-        member.id === editingMember.id ? editingMember : member
-      )
-    );
-    
-    setIsEditDialogOpen(false);
-    setEditingMember(null);
-
-    toast({
-      title: "회원 수정 완료",
-      description: `${editingMember.name}님의 정보가 수정되었습니다.`,
-    });
+    try {
+      await updateMember(editingMember);
+      toast({
+        title: "회원 수정 완료",
+        description: `${editingMember.name}님의 정보가 수정되었습니다.`,
+      });
+    } catch (error) {
+      toast({
+        title: "회원 수정 실패",
+        description: "회원 수정 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const adminCount = members.filter(m => m.roleName === "관리자").length;
-  const managerCount = members.filter(m => m.roleName === "팀장").length;
-  const employeeCount = members.filter(m => m.roleName === "일반사용자").length;
-  const activeCount = members.filter(m => m.status === "활성").length;
-  const totalAvailableVacation = members.reduce((sum, m) => sum + (m.totalVacationDays - m.usedVacationDays), 0);
-  const totalUsedVacation = members.reduce((sum, m) => sum + m.usedVacationDays, 0);
+  // 통계 데이터 가져오기
+  const statistics = getStatistics();
 
   return (
     <div className="space-y-6">
@@ -188,7 +176,7 @@ const MemberManagement = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{members.length}</div>
+            <div className="text-2xl font-bold">{statistics.totalMembers}</div>
           </CardContent>
         </Card>
 
@@ -198,7 +186,7 @@ const MemberManagement = () => {
             <User className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{activeCount}</div>
+            <div className="text-2xl font-bold text-green-600">{statistics.activeCount}</div>
           </CardContent>
         </Card>
 
@@ -208,7 +196,7 @@ const MemberManagement = () => {
             <Shield className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{managerCount}</div>
+            <div className="text-2xl font-bold text-blue-600">{statistics.managerCount}</div>
           </CardContent>
         </Card>
 
@@ -218,7 +206,7 @@ const MemberManagement = () => {
             <Shield className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{adminCount}</div>
+            <div className="text-2xl font-bold text-red-600">{statistics.adminCount}</div>
           </CardContent>
         </Card>
 
@@ -228,7 +216,7 @@ const MemberManagement = () => {
             <Calendar className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{totalAvailableVacation}</div>
+            <div className="text-2xl font-bold text-green-600">{statistics.totalAvailableVacation}</div>
           </CardContent>
         </Card>
 
@@ -238,7 +226,7 @@ const MemberManagement = () => {
             <CalendarDays className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{totalUsedVacation}</div>
+            <div className="text-2xl font-bold text-orange-600">{statistics.totalUsedVacation}</div>
           </CardContent>
         </Card>
       </div>

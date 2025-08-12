@@ -11,30 +11,62 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { User } from "lucide-react";
+import { useUserStore } from "@/stores/userStore";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProfileDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUsername: string;
-  onUpdateProfile: (newUsername: string) => void;
+  currentNickname: string;
+  onUpdateProfile: (newNickname: string) => Promise<void>;
 }
 
-const ProfileDialog = ({ isOpen, onClose, currentUsername, onUpdateProfile }: ProfileDialogProps) => {
-  const [username, setUsername] = useState(currentUsername);
+const ProfileDialog = ({ isOpen, onClose, currentNickname, onUpdateProfile }: ProfileDialogProps) => {
+  const { toast } = useToast();
+  const { userProfile } = useUserStore();
+  
+  const [nickname, setNickname] = useState(userProfile?.nickname || currentNickname);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleSave = () => {
-    if (username.trim() && username !== currentUsername) {
-      onUpdateProfile(username.trim());
+  const handleSave = async () => {
+    if (!nickname.trim()) {
+      toast({
+        title: "입력 오류",
+        description: "닉네임을 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
     }
+
+    // 닉네임이 변경된 경우에만 업데이트
+    if (nickname.trim() !== userProfile?.nickname) {
+      setIsUpdating(true);
+      try {
+        await onUpdateProfile(nickname.trim());
+        toast({
+          title: "프로필 업데이트 완료",
+          description: "닉네임이 성공적으로 변경되었습니다.",
+        });
+      } catch (error) {
+        toast({
+          title: "업데이트 실패",
+          description: "프로필 업데이트 중 오류가 발생했습니다.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsUpdating(false);
+      }
+    }
+    
     onClose();
   };
 
   const handleClose = () => {
     // Reset form when closing
-    setUsername(currentUsername);
+    setNickname(userProfile?.nickname || currentNickname);
     setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
@@ -56,14 +88,25 @@ const ProfileDialog = ({ isOpen, onClose, currentUsername, onUpdateProfile }: Pr
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="username">사용자명</Label>
+            <Label htmlFor="nickname">닉네임</Label>
             <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="사용자명을 입력하세요"
+              id="nickname"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="닉네임을 입력하세요"
             />
           </div>
+
+          {userProfile && (
+            <div className="space-y-2">
+              <Label>사용자명</Label>
+              <Input
+                value={userProfile.username}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+          )}
 
           <div className="border-t pt-4">
             <h4 className="text-sm font-medium mb-3">비밀번호 변경</h4>
@@ -106,11 +149,11 @@ const ProfileDialog = ({ isOpen, onClose, currentUsername, onUpdateProfile }: Pr
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} disabled={isUpdating}>
             취소
           </Button>
-          <Button onClick={handleSave}>
-            저장
+          <Button onClick={handleSave} disabled={isUpdating}>
+            {isUpdating ? "저장 중..." : "저장"}
           </Button>
         </DialogFooter>
       </DialogContent>

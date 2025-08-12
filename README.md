@@ -71,3 +71,14 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## 파일구조
+src/
+├── stores/
+│   └── memberStore.ts          # Zustand 상태 관리
+├── components/admin/
+│   ├── MemberManagement.tsx    # 메인 관리 컴포넌트
+│   ├── MemberAdd.tsx          # 회원 추가 다이얼로그
+│   └── MemberMod.tsx          # 회원 수정 다이얼로그
+└── pages/
+    └── MemberManagement.tsx    # 페이지 래퍼

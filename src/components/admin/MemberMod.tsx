@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,26 +16,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-export type EditMember = {
-  id: string;
-  name: string;
-  email: string;  
-  nickname: string;
-  department: string;
-  position: string;
-  roleName: string;
-  status: string; // accept API variations e.g., "활성" | "비활성" | "정지" | "탈퇴"
-  joinDate: string;
-  totalVacationDays: number;
-  usedVacationDays: number;
-};
+import { EditMember } from "@/stores/memberStore";
 
 type MemberModProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   member: EditMember | null;
-  setMember: Dispatch<SetStateAction<EditMember | null>>;
+  setMember: (member: EditMember | null) => void;
   onSubmit: () => void;
 };
 
@@ -55,7 +41,7 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
               <Input
                 id="edit-name"
                 value={member.name}
-                onChange={(e) => setMember((prev) => (prev ? { ...prev, name: e.target.value } : prev))}
+                onChange={(e) => setMember(member ? { ...member, name: e.target.value } : member)}
                 placeholder="이름을 입력하세요"
               />
             </div>
@@ -65,7 +51,7 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
                 id="edit-email"
                 type="email"
                 value={member.email}
-                onChange={(e) => setMember((prev) => (prev ? { ...prev, email: e.target.value } : prev))}
+                onChange={(e) => setMember(member ? { ...member, email: e.target.value } : member)}
                 placeholder="이메일을 입력하세요"
               />
             </div>
@@ -74,7 +60,7 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
               <Input
                 id="edit-nickname"
                 value={member.nickname}
-                onChange={(e) => setMember((prev) => (prev ? { ...prev, nickname: e.target.value } : prev))}
+                onChange={(e) => setMember(member ? { ...member, nickname: e.target.value } : member)}
                 placeholder="닉네임을 입력하세요"
               />
             </div>
@@ -83,7 +69,7 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
               <Input
                 id="edit-department"
                 value={member.department}
-                onChange={(e) => setMember((prev) => (prev ? { ...prev, department: e.target.value } : prev))}
+                onChange={(e) => setMember(member ? { ...member, department: e.target.value } : member)}
                 placeholder="부서를 입력하세요"
               />
             </div>
@@ -92,7 +78,7 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
               <Input
                 id="edit-position"
                 value={member.position}
-                onChange={(e) => setMember((prev) => (prev ? { ...prev, position: e.target.value } : prev))}
+                onChange={(e) => setMember(member ? { ...member, position: e.target.value } : member)}
                 placeholder="직급을 입력하세요"
               />
             </div>
@@ -101,16 +87,16 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
               <Select
                 value={member.roleName}
                 onValueChange={(value: "관리자" | "팀장" | "일반사용자") =>
-                  setMember((prev) => (prev ? { ...prev, roleName: value } : prev))
+                  setMember(member ? { ...member, roleName: value } : member)
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="role-user">일반사용자</SelectItem>
-                  <SelectItem value="role-manager">팀장</SelectItem>
-                  <SelectItem value="role-admin">관리자</SelectItem>
+                  <SelectItem value="일반사용자">일반사용자</SelectItem>
+                  <SelectItem value="팀장">팀장</SelectItem>
+                  <SelectItem value="관리자">관리자</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -119,7 +105,7 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
               <Select
                 value={member.status}
                 onValueChange={(value: "ACTIVE" | "INACTIVE") =>
-                  setMember((prev) => (prev ? { ...prev, status: value } : prev))
+                  setMember(member ? { ...member, status: value } : member)
                 }
               >
                 <SelectTrigger>
@@ -137,7 +123,7 @@ const MemberMod = ({ open, onOpenChange, member, setMember, onSubmit }: MemberMo
                 id="edit-joinDate"
                 type="date"
                 value={member.joinDate}
-                onChange={(e) => setMember((prev) => (prev ? { ...prev, joinDate: e.target.value } : prev))}
+                onChange={(e) => setMember(member ? { ...member, joinDate: e.target.value } : member)}
               />
             </div>
           </div>

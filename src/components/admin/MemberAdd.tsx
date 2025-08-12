@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,21 +16,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-export type NewMemberInput = {
-  name: string;
-  email: string;
-  nickname: string;
-  department: string;
-  position: string;
-  roleName: string;
-};
+import { useMemberStore, NewMemberInput } from "@/stores/memberStore";
 
 type MemberAddProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   newMember: NewMemberInput;
-  setNewMember: Dispatch<SetStateAction<NewMemberInput>>;
+  setNewMember: (member: NewMemberInput) => void;
   onSubmit: () => void;
 };
 
@@ -49,7 +40,7 @@ const MemberAdd = ({ open, onOpenChange, newMember, setNewMember, onSubmit }: Me
             <Input
               id="name"
               value={newMember.name}
-              onChange={(e) => setNewMember((prev) => ({ ...prev, name: e.target.value }))}
+              onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
               placeholder="이름을 입력하세요"
             />
           </div>
@@ -59,7 +50,7 @@ const MemberAdd = ({ open, onOpenChange, newMember, setNewMember, onSubmit }: Me
               id="email"
               type="email"
               value={newMember.email}
-              onChange={(e) => setNewMember((prev) => ({ ...prev, email: e.target.value }))}
+              onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
               placeholder="이메일을 입력하세요"
             />
           </div>
@@ -68,7 +59,7 @@ const MemberAdd = ({ open, onOpenChange, newMember, setNewMember, onSubmit }: Me
             <Input
               id="nickname"
               value={newMember.nickname}
-              onChange={(e) => setNewMember((prev) => ({ ...prev, nickname: e.target.value }))}
+              onChange={(e) => setNewMember({ ...newMember, nickname: e.target.value })}
               placeholder="닉네임을 입력하세요"
             />
           </div>
@@ -77,7 +68,7 @@ const MemberAdd = ({ open, onOpenChange, newMember, setNewMember, onSubmit }: Me
             <Input
               id="department"
               value={newMember.department}
-              onChange={(e) => setNewMember((prev) => ({ ...prev, department: e.target.value }))}
+              onChange={(e) => setNewMember({ ...newMember, department: e.target.value })}
               placeholder="부서를 입력하세요"
             />
           </div>
@@ -86,7 +77,7 @@ const MemberAdd = ({ open, onOpenChange, newMember, setNewMember, onSubmit }: Me
             <Input
               id="position"
               value={newMember.position}
-              onChange={(e) => setNewMember((prev) => ({ ...prev, position: e.target.value }))}
+              onChange={(e) => setNewMember({ ...newMember, position: e.target.value })}
               placeholder="직급을 입력하세요"
             />
           </div>
@@ -95,16 +86,16 @@ const MemberAdd = ({ open, onOpenChange, newMember, setNewMember, onSubmit }: Me
             <Select
               value={newMember.roleName}
               onValueChange={(value: "관리자" | "팀장" | "일반사용자") =>
-                setNewMember((prev) => ({ ...prev, roleName: value }))
+                setNewMember({ ...newMember, roleName: value })
               }
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="role-user">일반사용자</SelectItem>
-                <SelectItem value="role-manager">팀장</SelectItem>
-                <SelectItem value="role-admin">관리자</SelectItem>
+                <SelectItem value="일반사용자">일반사용자</SelectItem>
+                <SelectItem value="팀장">팀장</SelectItem>
+                <SelectItem value="관리자">관리자</SelectItem>
               </SelectContent>
             </Select>
           </div>

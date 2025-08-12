@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -34,6 +35,7 @@ const Login = () => {
 
       navigate("/", { state: { username: response.data.name } });
     } catch (err) {
+      toast.error(err.response.data.message);
       setError("로그인에 실패했습니다. 사용자명 또는 비밀번호를 확인해주세요.");
       console.error(err);
     } finally {
