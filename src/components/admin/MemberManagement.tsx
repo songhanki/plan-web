@@ -257,7 +257,7 @@ const MemberManagement = () => {
             </TableHeader>
             <TableBody>
               {members.map((member) => (
-                <TableRow key={member.id}>
+                <TableRow key={member.email}> {/* 이메일로 키 설정 -- fixme 추후 다른 키값으로 변경 */}
                   <TableCell className="font-medium">{member.name}</TableCell>
                   <TableCell>{member.email}</TableCell>
                   <TableCell>{member.nickname}</TableCell>

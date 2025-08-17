@@ -135,19 +135,8 @@ export const useMemberStore = create<MemberState>()(
       // 회원 추가
       addMember: async (memberInput: NewMemberInput) => {
         try {
-          // 실제 API 호출 시 아래 코드를 사용
-          // const response = await axios.post('/api/members', memberInput);
-          // const newMember = response.data;
-          
-          // 임시 로컬 데이터 생성 (API 연동 전까지)
-          const newMember: Member = {
-            id: Date.now().toString(),
-            ...memberInput,
-            status: "ACTIVE",
-            joinDate: new Date().toISOString().split('T')[0],
-            totalVacationDays: 15,
-            usedVacationDays: 0,
-          };
+          const response = await axios.post('/api/members', memberInput);
+          const newMember = response.data;
 
           set(state => ({
             members: [...state.members, newMember],
@@ -166,8 +155,7 @@ export const useMemberStore = create<MemberState>()(
       // 회원 수정
       updateMember: async (updatedMember: EditMember) => {
         try {
-          // 실제 API 호출 시 아래 코드를 사용
-          // await axios.put(`/api/members/${updatedMember.id}`, updatedMember);
+          await axios.put(`/api/members/member/${updatedMember.id}`, updatedMember);
           
           set(state => ({
             members: state.members.map(member =>
@@ -188,8 +176,7 @@ export const useMemberStore = create<MemberState>()(
       // 회원 삭제
       deleteMember: async (memberId: string) => {
         try {
-          // 실제 API 호출 시 아래 코드를 사용
-          // await axios.delete(`/api/members/${memberId}`);
+          await axios.delete(`/api/members/${memberId}`);
           
           set(state => ({
             members: state.members.filter(member => member.id !== memberId)
